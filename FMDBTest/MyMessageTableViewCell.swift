@@ -11,6 +11,10 @@ import UIKit
 class MyMessageTableViewCell: UITableViewCell {
 
     @IBOutlet weak var myMessageTextLabel: UILabel!
+    @IBOutlet weak var myImageView: UIImageView!
+    @IBOutlet weak var senderMessageTextLabel: UILabel!
+    @IBOutlet weak var senderImageView: UIImageView!
+
     
     override func awakeFromNib() {
         super.awakeFromNib()

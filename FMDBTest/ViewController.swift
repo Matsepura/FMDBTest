@@ -50,7 +50,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         tableView.dataSource = self
         self.tableView.tableFooterView = UIView()
         
-        self.tableView.estimatedRowHeight = 120
+        self.tableView.estimatedRowHeight = 60
         self.tableView.rowHeight = UITableViewAutomaticDimension
         
         self.fileURL = getDatabaseURL()
@@ -94,12 +94,51 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCellWithIdentifier("cellMyself", forIndexPath: indexPath)
-        
-        if let cell = cell as? MyMessageTableViewCell {
+
+        var cell: MyMessageTableViewCell
+ 
+        // аля два человека, создание двух бабл ячеек
+        if indexPath.row % 2 == 0 {
+            cell = tableView.dequeueReusableCellWithIdentifier("cellMyself", forIndexPath: indexPath) as! MyMessageTableViewCell
+            if self.getMessageFromId(self.messages[indexPath.row]) == "message_text-196" {
+                /*
+                тут я вывожу картинку и выдает такую хрень
+                2016-02-02 13:52:48.678 FMDBTest[495:138762] Warning once only: 
+                Detected a case where constraints ambiguously suggest a height 
+                of zero for a tableview cell's content view. We're considering 
+                the collapse unintentional and using standard height instead.
+                saveToDataBase
+                */
+                self.tableView.layoutIfNeeded()
+                cell = tableView.dequeueReusableCellWithIdentifier("myCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
+                cell.myImageView.backgroundColor = UIColor.lightGrayColor()
+            } else {
             cell.myMessageTextLabel.text = self.getMessageFromId(self.messages[indexPath.row])
+            }
+        } else {
+            cell = tableView.dequeueReusableCellWithIdentifier("cellSender", forIndexPath: indexPath) as! MyMessageTableViewCell
+            if self.getMessageFromId(self.messages[indexPath.row]) == "message_text-191" {
+                /*
+                тут я вывожу картинку и выдает такую хрень
+                2016-02-02 13:52:48.678 FMDBTest[495:138762] Warning once only:
+                Detected a case where constraints ambiguously suggest a height
+                of zero for a tableview cell's content view. We're considering
+                the collapse unintentional and using standard height instead.
+                saveToDataBase
+                */
+                self.tableView.layoutIfNeeded()
+                cell = tableView.dequeueReusableCellWithIdentifier("senderCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
+                cell.myImageView.backgroundColor = UIColor.lightGrayColor()
+            } else {
+            cell.senderMessageTextLabel.text = self.getMessageFromId(self.messages[indexPath.row])
+            }
         }
+ 
+        
+        
+//        if let cell = cell as? MyMessageTableViewCell {
+//            cell.myMessageTextLabel.text = self.getMessageFromId(self.messages[indexPath.row])
+//        }
         
         return cell
     }
@@ -109,23 +148,46 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {
-
-//        let currentHeight = scrollView.contentSize.height - scrollView.frame.size.height
+        
+        //        let currentHeight = scrollView.contentSize.height - scrollView.frame.size.height
         let scrollOffset: CGFloat = 0
         if scrollView.contentOffset.y <=  scrollOffset
             && !self.isLoadingMessages {
                 self.isLoadingMessages = true
                 let lastMessage = self.messages.first
                 let newMessages = self.readDatabase(lastMessage, limit: 10)
-                guard newMessages.count > 0 else { return }
-                self.messages = newMessages + self.messages
-                self.tableView.reloadData()
-                
-                self.tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 10, inSection: 0), atScrollPosition: .Top, animated: false)
-                
-                dispatch_async(dispatch_get_main_queue()) {
-                    self.isLoadingMessages = false
+                if newMessages.count > 0 {                 self.messages = newMessages + self.messages
+                    self.tableView.reloadData()
+                    
+                    self.tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 10, inSection: 0), atScrollPosition: .Top, animated: false)
+                    
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.isLoadingMessages = false
+                    }
+                } else {
+                    //ковырять здесь!
+                    // все работает, но где-то проскроливает и пропадают картинки и меняется порядок
+                    print("empty! \n need to append to array new record")
+                    createDatabase()
+                    let arrayToAppend = self.readDatabase(self.messages.last, limit: 50)
+                    for i in 0...49 {
+                        self.messages.insert(arrayToAppend[i], atIndex: i)
+                    }
+                    self.isLoadingMessages = true
+                    let lastMessage = self.messages.first
+                    let newMessages = self.readDatabase(lastMessage, limit: 10)
+                    if newMessages.count > 0 {                 self.messages = newMessages + self.messages
+                        self.tableView.reloadData()
+                        
+                        self.tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 10, inSection: 0), atScrollPosition: .Top, animated: false)
+                        
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self.isLoadingMessages = false
+                        }
+                    }
+                    // здесь вместо return создавать новые объекты догружать и вставлятьв начало общего массива
                 }
+                
         }
     }
     
@@ -166,6 +228,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         guard let message = messageField.text else { return }
         
+        // if ниже - это проверка на пустое поле (иначе сохраняет пустые поля аля баг)
+        // может вывести в свич? чтобы потом сохранять отдельно картинки, текст, ничего, юрл и тд?
+        
+        if messageField.text != "" {
         self.saveToDataBase(message) { success in
             guard success else { return }
             guard self.messages.count > self.tableView.numberOfRowsInSection(0) else { return }
@@ -175,6 +241,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             self.tableView.contentOffset = CGPoint(x: 0, y: height)
         }
         messageField.text = ""
+        }
     }
     
     func saveToDataBase(text: String, finishBlock: ((success: Bool) -> ())) {
@@ -349,7 +416,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func fillDB(db: FMDatabase) {
-        for i in 0...99 {
+        for i in 0...199 {
             let dateFormatter = NSDateFormatter()
             dateFormatter.dateFormat = "MM/dd/yyyy HH:mm:ss:SSS"
             

@@ -30,10 +30,10 @@
                                         <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                                     </textField>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sBR-pW-jrA">
-                                        <rect key="frame" x="267" y="5" width="45" height="30"/>
+                                        <rect key="frame" x="258" y="0.0" width="62" height="40"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="30" id="TW3-SI-iet"/>
-                                            <constraint firstAttribute="width" constant="45" id="sL2-np-M9Z"/>
+                                            <constraint firstAttribute="height" constant="40" id="TW3-SI-iet"/>
+                                            <constraint firstAttribute="width" constant="62" id="sL2-np-M9Z"/>
                                         </constraints>
                                         <state key="normal" title="Send">
                                             <color key="titleColor" red="0.0" green="0.25098040700000002" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
@@ -46,10 +46,10 @@
                                 <color key="backgroundColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstItem="3aH-b9-bGP" firstAttribute="centerY" secondItem="DrX-x0-1YC" secondAttribute="centerY" id="Cim-3v-yCV"/>
-                                    <constraint firstAttribute="bottom" secondItem="sBR-pW-jrA" secondAttribute="bottom" constant="5" id="KHp-w0-bSG"/>
+                                    <constraint firstAttribute="bottom" secondItem="sBR-pW-jrA" secondAttribute="bottom" id="KHp-w0-bSG"/>
                                     <constraint firstAttribute="height" constant="40" id="UYm-jN-qBC"/>
                                     <constraint firstItem="3aH-b9-bGP" firstAttribute="leading" secondItem="DrX-x0-1YC" secondAttribute="leading" constant="8" id="b6F-w9-meu"/>
-                                    <constraint firstAttribute="trailing" secondItem="sBR-pW-jrA" secondAttribute="trailing" constant="8" id="okx-Sc-nnd"/>
+                                    <constraint firstAttribute="trailing" secondItem="sBR-pW-jrA" secondAttribute="trailing" id="okx-Sc-nnd"/>
                                     <constraint firstAttribute="trailing" secondItem="3aH-b9-bGP" secondAttribute="trailing" constant="61" id="xiu-sq-ebB"/>
                                 </constraints>
                             </view>
@@ -57,24 +57,15 @@
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="464"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="w0F-CJ-Fcd">
-                                        <rect key="frame" x="0.0" y="28" width="320" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="w0F-CJ-Fcd" id="dDE-Lz-p9Q">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </tableViewCellContentView>
-                                        <inset key="separatorInset" minX="14" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="cellMyself" rowHeight="120" id="Qlb-AM-QfP" customClass="MyMessageTableViewCell" customModule="FMDBTest" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="72" width="320" height="120"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="cellMyself" rowHeight="50" id="Qlb-AM-QfP" customClass="MyMessageTableViewCell" customModule="FMDBTest" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="28" width="320" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Qlb-AM-QfP" id="0Yd-aA-7wz">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="120"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Lorem ipsum dolor sit er elit lamet, consectetaur cillium" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A9K-SN-Huj">
-                                                    <rect key="frame" x="178" y="8" width="134" height="104"/>
+                                                    <rect key="frame" x="178" y="8" width="134" height="34"/>
                                                     <color key="backgroundColor" red="0.0" green="0.50196081400000003" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                     <color key="textColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
@@ -95,6 +86,84 @@
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="myMessageTextLabel" destination="A9K-SN-Huj" id="jI0-sC-u98"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="cellSender" rowHeight="50" id="fCB-6r-1IM" customClass="MyMessageTableViewCell" customModule="FMDBTest" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="78" width="320" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="fCB-6r-1IM" id="Aqx-kM-uMK">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Lorem ipsum dolor sit er elit lamet, consectetaur cillium" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T3K-2n-KvV">
+                                                    <rect key="frame" x="8" y="8" width="134" height="34"/>
+                                                    <color key="backgroundColor" red="0.0" green="0.25098040700000002" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <color key="textColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                            <integer key="value" value="10"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="T3K-2n-KvV" firstAttribute="leading" secondItem="Aqx-kM-uMK" secondAttribute="leadingMargin" id="cpW-C8-uQ0"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="T3K-2n-KvV" secondAttribute="bottom" id="dWG-KA-xoh"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="T3K-2n-KvV" secondAttribute="trailing" constant="170" id="diz-Q4-4bB"/>
+                                                <constraint firstAttribute="topMargin" secondItem="T3K-2n-KvV" secondAttribute="top" id="ftW-S0-h1f"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="senderMessageTextLabel" destination="T3K-2n-KvV" id="FeG-X6-cpg"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="myCellWithImage" rowHeight="60" id="AG3-bM-ixs" customClass="MyMessageTableViewCell" customModule="FMDBTest" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="128" width="320" height="60"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="AG3-bM-ixs" id="v1W-N6-hpz">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7Tj-0y-by6">
+                                                    <rect key="frame" x="252" y="0.0" width="60" height="60"/>
+                                                    <color key="backgroundColor" red="0.0" green="0.50196081400000003" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
+                                                </imageView>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <constraints>
+                                            <constraint firstAttribute="bottom" secondItem="7Tj-0y-by6" secondAttribute="bottom" id="3Ee-fj-m4R"/>
+                                            <constraint firstAttribute="trailing" secondItem="7Tj-0y-by6" secondAttribute="trailing" constant="8" id="57N-et-asm"/>
+                                            <constraint firstItem="7Tj-0y-by6" firstAttribute="leading" secondItem="AG3-bM-ixs" secondAttribute="leading" constant="252" id="aVm-Jy-V5o"/>
+                                            <constraint firstItem="7Tj-0y-by6" firstAttribute="top" secondItem="AG3-bM-ixs" secondAttribute="top" id="kTj-CX-lNd"/>
+                                        </constraints>
+                                        <connections>
+                                            <outlet property="myImageView" destination="7Tj-0y-by6" id="zyj-3b-imh"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="senderCellWithImage" rowHeight="60" id="tMp-ew-Onz" customClass="MyMessageTableViewCell" customModule="FMDBTest" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="188" width="320" height="60"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="tMp-ew-Onz" id="znh-7F-NaQ">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="DTq-xV-cvl">
+                                                    <rect key="frame" x="8" y="0.0" width="60" height="60"/>
+                                                    <color key="backgroundColor" red="0.0" green="0.50196081400000003" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
+                                                </imageView>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <constraints>
+                                            <constraint firstItem="DTq-xV-cvl" firstAttribute="leading" secondItem="tMp-ew-Onz" secondAttribute="leading" constant="8" id="488-ls-XzZ"/>
+                                            <constraint firstItem="DTq-xV-cvl" firstAttribute="top" secondItem="tMp-ew-Onz" secondAttribute="top" id="B33-Mh-WnA"/>
+                                            <constraint firstAttribute="trailing" secondItem="DTq-xV-cvl" secondAttribute="trailing" constant="252" id="YGg-cC-Ohy"/>
+                                            <constraint firstAttribute="bottom" secondItem="DTq-xV-cvl" secondAttribute="bottom" id="gmr-WZ-G3w"/>
+                                        </constraints>
+                                        <connections>
+                                            <outlet property="myImageView" destination="DTq-xV-cvl" id="TYU-mp-MhP"/>
+                                            <outlet property="senderImageView" destination="DTq-xV-cvl" id="C1Q-Ki-Nkt"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -127,7 +196,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7YA-zR-ql2" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="609" y="-3744"/>
+            <point key="canvasLocation" x="702" y="-3744"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="cQd-ZX-xjg">
@@ -150,7 +219,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Dbt-DG-XjU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-208" y="-3744"/>
+            <point key="canvasLocation" x="-201" y="-3744"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="fsz-S4-Jac">
@@ -185,7 +254,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="O3T-zo-dhy" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="208" y="-4321"/>
+            <point key="canvasLocation" x="246" y="-3744"/>
         </scene>
     </scenes>
 </document>
