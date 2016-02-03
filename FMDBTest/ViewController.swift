@@ -92,52 +92,51 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         var cell: MyMessageTableViewCell
+        let textInCell = self.dataBaseManager.getMessageFromId(self.messages[indexPath.row])
+        print(textInCell)
+        print(indexPath.row)
         
-        // аля два человека, создание двух бабл ячеек
-        if indexPath.row % 2 == 0 {
+        switch (indexPath.row, textInCell) {
+            
+        case (let i, let textForImage) where i % 2 == 0 && textForImage == "message_text-196" || i % 2 == 0 && textForImage == "message_text-191":
+            
+            self.tableView.layoutIfNeeded()
+            cell = tableView.dequeueReusableCellWithIdentifier("myCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
+            cell.myImageView.backgroundColor = UIColor.lightGrayColor()
+            print("(let i, let textForImage) where i % 2 == 0 && textForImage ==")
+            
+        case (let i, _) where i % 2 == 0:
             
             cell = tableView.dequeueReusableCellWithIdentifier("cellMyself", forIndexPath: indexPath) as! MyMessageTableViewCell
-            if self.dataBaseManager.getMessageFromId(self.messages[indexPath.row]) == "message_text-196" || self.dataBaseManager.getMessageFromId(self.messages[indexPath.row]) == "message_text-191" {
-                
-                /*
-                тут я вывожу картинку и выдает такую хрень
-                2016-02-02 13:52:48.678 FMDBTest[495:138762] Warning once only:
-                Detected a case where constraints ambiguously suggest a height
-                of zero for a tableview cell's content view. We're considering
-                the collapse unintentional and using standard height instead.
-                saveToDataBase
-                */
-                
-                self.tableView.layoutIfNeeded()
-                cell = tableView.dequeueReusableCellWithIdentifier("myCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
-                cell.myImageView.backgroundColor = UIColor.lightGrayColor()
-            } else {
-                cell.myMessageTextLabel.text = self.dataBaseManager.getMessageFromId(self.messages[indexPath.row])
-            }
-        } else {
+            cell.myMessageTextLabel.text = textInCell
+            print("(let i, _) where i % 2 == 0")
+            
+        case (let i, let textForImage) where i % 2 != 0 && textForImage == "message_text-196" || i % 2 != 0 && textForImage == "message_text-191":
+            
+            /*
+            тут я вывожу картинку и выдает такую хрень
+            Warning once only:
+            Detected a case where constraints ambiguously suggest a height
+            of zero for a tableview cell's content view. We're considering
+            the collapse unintentional and using standard height instead.
+            saveToDataBase
+            */
+            
+            cell = tableView.dequeueReusableCellWithIdentifier("senderCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
+            cell.senderImageView.backgroundColor = UIColor.lightGrayColor()
+            print("(let i, let textForImage) where i % 2 != 0 && textForImage ==")
+            
+        case (let i, _) where i % 2 != 0:
+            
             cell = tableView.dequeueReusableCellWithIdentifier("cellSender", forIndexPath: indexPath) as! MyMessageTableViewCell
-            if self.dataBaseManager.getMessageFromId(self.messages[indexPath.row]) == "message_text-191" || self.dataBaseManager.getMessageFromId(self.messages[indexPath.row]) == "message_text-196" {
-                
-                /*
-                тут я вывожу картинку и выдает такую хрень
-                2016-02-02 13:52:48.678 FMDBTest[495:138762] Warning once only:
-                Detected a case where constraints ambiguously suggest a height
-                of zero for a tableview cell's content view. We're considering
-                the collapse unintentional and using standard height instead.
-                saveToDataBase
-                */
-                
-                self.tableView.layoutIfNeeded()
-                cell = tableView.dequeueReusableCellWithIdentifier("senderCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
-                cell.myImageView.backgroundColor = UIColor.lightGrayColor()
-            } else {
-                cell.senderMessageTextLabel.text = self.dataBaseManager.getMessageFromId(self.messages[indexPath.row])
-            }
+            cell.senderMessageTextLabel.text = textInCell
+            print("(let i, _) where i % 2 != 0:")
+            
+        default:
+            cell = tableView.dequeueReusableCellWithIdentifier("cellMyself", forIndexPath: indexPath) as! MyMessageTableViewCell
+            cell.myMessageTextLabel.text = "error!"
+            break
         }
-        
-        //        if let cell = cell as? MyMessageTableViewCell {
-        //            cell.myMessageTextLabel.text = self.getMessageFromId(self.messages[indexPath.row])
-        //        }
         
         return cell
     }
