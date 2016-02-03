@@ -55,9 +55,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         self.fileURL = getDatabaseURL()
         
-//        self.cleanDatabase()
+        self.cleanDatabase()
         self.createReaderWriter()
-//        self.createDatabase()
+        self.createDatabase()
         
         self.messages = self.readDatabase(nil, limit: 40)
         self.tableView.setContentOffset(CGPointMake(0, CGFloat.max), animated: true)
@@ -74,9 +74,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func scrollToBottom() {
-    
-    self.tableView.scrollRectToVisible(CGRectMake(0, self.tableView.contentSize.height - self.tableView.bounds.size.height , self.tableView.bounds.size.width, self.tableView.bounds.size.height), animated: true)
         
+        self.tableView.scrollRectToVisible(CGRectMake(0, self.tableView.contentSize.height - self.tableView.bounds.size.height , self.tableView.bounds.size.width, self.tableView.bounds.size.height), animated: true)
     }
     
     deinit {
@@ -94,30 +93,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-
+        
         var cell: MyMessageTableViewCell
- 
+        
         // аля два человека, создание двух бабл ячеек
         if indexPath.row % 2 == 0 {
+            
             cell = tableView.dequeueReusableCellWithIdentifier("cellMyself", forIndexPath: indexPath) as! MyMessageTableViewCell
-            if self.getMessageFromId(self.messages[indexPath.row]) == "message_text-196" {
-                /*
-                тут я вывожу картинку и выдает такую хрень
-                2016-02-02 13:52:48.678 FMDBTest[495:138762] Warning once only: 
-                Detected a case where constraints ambiguously suggest a height 
-                of zero for a tableview cell's content view. We're considering 
-                the collapse unintentional and using standard height instead.
-                saveToDataBase
-                */
-                self.tableView.layoutIfNeeded()
-                cell = tableView.dequeueReusableCellWithIdentifier("myCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
-                cell.myImageView.backgroundColor = UIColor.lightGrayColor()
-            } else {
-            cell.myMessageTextLabel.text = self.getMessageFromId(self.messages[indexPath.row])
-            }
-        } else {
-            cell = tableView.dequeueReusableCellWithIdentifier("cellSender", forIndexPath: indexPath) as! MyMessageTableViewCell
-            if self.getMessageFromId(self.messages[indexPath.row]) == "message_text-191" {
+            if self.getMessageFromId(self.messages[indexPath.row]) == "message_text-196" || self.getMessageFromId(self.messages[indexPath.row]) == "message_text-191" {
+                
                 /*
                 тут я вывожу картинку и выдает такую хрень
                 2016-02-02 13:52:48.678 FMDBTest[495:138762] Warning once only:
@@ -126,19 +110,37 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 the collapse unintentional and using standard height instead.
                 saveToDataBase
                 */
+                
+                self.tableView.layoutIfNeeded()
+                cell = tableView.dequeueReusableCellWithIdentifier("myCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
+                cell.myImageView.backgroundColor = UIColor.lightGrayColor()
+            } else {
+                cell.myMessageTextLabel.text = self.getMessageFromId(self.messages[indexPath.row])
+            }
+        } else {
+            cell = tableView.dequeueReusableCellWithIdentifier("cellSender", forIndexPath: indexPath) as! MyMessageTableViewCell
+            if self.getMessageFromId(self.messages[indexPath.row]) == "message_text-191" || self.getMessageFromId(self.messages[indexPath.row]) == "message_text-196" {
+                
+                /*
+                тут я вывожу картинку и выдает такую хрень
+                2016-02-02 13:52:48.678 FMDBTest[495:138762] Warning once only:
+                Detected a case where constraints ambiguously suggest a height
+                of zero for a tableview cell's content view. We're considering
+                the collapse unintentional and using standard height instead.
+                saveToDataBase
+                */
+                
                 self.tableView.layoutIfNeeded()
                 cell = tableView.dequeueReusableCellWithIdentifier("senderCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
                 cell.myImageView.backgroundColor = UIColor.lightGrayColor()
             } else {
-            cell.senderMessageTextLabel.text = self.getMessageFromId(self.messages[indexPath.row])
+                cell.senderMessageTextLabel.text = self.getMessageFromId(self.messages[indexPath.row])
             }
         }
- 
         
-        
-//        if let cell = cell as? MyMessageTableViewCell {
-//            cell.myMessageTextLabel.text = self.getMessageFromId(self.messages[indexPath.row])
-//        }
+        //        if let cell = cell as? MyMessageTableViewCell {
+        //            cell.myMessageTextLabel.text = self.getMessageFromId(self.messages[indexPath.row])
+        //        }
         
         return cell
     }
@@ -149,52 +151,49 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func scrollViewDidScroll(scrollView: UIScrollView) {
         
-        //        let currentHeight = scrollView.contentSize.height - scrollView.frame.size.height
         let scrollOffset: CGFloat = 0
         if scrollView.contentOffset.y <=  scrollOffset
             && !self.isLoadingMessages {
+                
                 self.isLoadingMessages = true
                 let lastMessage = self.messages.first
                 let newMessages = self.readDatabase(lastMessage, limit: 10)
-                if newMessages.count > 0 {                 self.messages = newMessages + self.messages
-                    self.tableView.reloadData()
+                if newMessages.count > 0 {
                     
+                    self.messages = newMessages + self.messages
+                    self.tableView.reloadData()
                     self.tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 10, inSection: 0), atScrollPosition: .Top, animated: false)
                     
                     dispatch_async(dispatch_get_main_queue()) {
                         self.isLoadingMessages = false
                     }
                 } else {
-                    //ковырять здесь!
-                    // все работает, но где-то проскроливает и пропадают картинки и меняется порядок
+                    // здесь досоздаем базу данных и суём в начало общего массива
                     print("empty! \n need to append to array new record")
                     createDatabase()
-                    let arrayToAppend = self.readDatabase(self.messages.last, limit: 50)
-                    for i in 0...49 {
-                        self.messages.insert(arrayToAppend[i], atIndex: i)
-                    }
-                    self.isLoadingMessages = true
-                    let lastMessage = self.messages.first
-                    let newMessages = self.readDatabase(lastMessage, limit: 10)
-                    if newMessages.count > 0 {                 self.messages = newMessages + self.messages
+                    dispatch_async(dispatch_get_main_queue()) {
+                        let arrayToAppend = self.readDatabase(self.messages.last, limit: 50)
+                        for i in 0...49 {
+                            self.messages.insert(arrayToAppend[i], atIndex: i)
+                        }
+                        
+                        self.isLoadingMessages = true
                         self.tableView.reloadData()
                         
-                        self.tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 10, inSection: 0), atScrollPosition: .Top, animated: false)
+                        self.tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 50, inSection: 0), atScrollPosition: .Top, animated: false)
                         
                         dispatch_async(dispatch_get_main_queue()) {
                             self.isLoadingMessages = false
                         }
+                        
                     }
-                    // здесь вместо return создавать новые объекты догружать и вставлятьв начало общего массива
+                    // здесь вместо return создавать новые объекты догружать и вставлять в начало общего массива
                 }
-                
         }
     }
     
     func loadedTrue() {
-        
         self.isLoadingMessages = false
-        
     }
     
     //MARK: - Keyboard show/hide
@@ -232,15 +231,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // может вывести в свич? чтобы потом сохранять отдельно картинки, текст, ничего, юрл и тд?
         
         if messageField.text != "" {
-        self.saveToDataBase(message) { success in
-            guard success else { return }
-            guard self.messages.count > self.tableView.numberOfRowsInSection(0) else { return }
-            self.tableView.reloadData()
-            
-            let height = self.tableView.contentSize.height - self.tableView.bounds.height
-            self.tableView.contentOffset = CGPoint(x: 0, y: height)
-        }
-        messageField.text = ""
+            self.saveToDataBase(message) { success in
+                guard success else { return }
+                guard self.messages.count > self.tableView.numberOfRowsInSection(0) else { return }
+                self.tableView.reloadData()
+                
+                let height = self.tableView.contentSize.height - self.tableView.bounds.height
+                self.tableView.contentOffset = CGPoint(x: 0, y: height)
+            }
+            messageField.text = ""
         }
     }
     
@@ -271,34 +270,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         finishBlock(success: success)
     }
     
-//    func firstLoadFromDataBaseToMessenger() -> [String] {
-//        let array = self.readDatabase()
-//        var arrayToMessenger: [String] = []
-//        
-//        for i in 0...29 {
-//            arrayToMessenger.append(array[i])
-//        }
-//        
-//        self.countOfLoadedMessges = arrayToMessenger.count
-//        return arrayToMessenger
-//    }
-//    
-//    func nextLoadFromDataBaseToMessenger() -> [String] {
-//        print("nextLoadFromDataBaseToMessenger")
-//        let array = self.readDatabase()
-//        var arrayToMessenger: [String] = []
-//        
-//        for _ in 0...9 {
-//            if self.countOfLoadedMessges <= array.count - 1 {
-//                print("work ")
-//                arrayToMessenger.append(array[self.countOfLoadedMessges])
-//                self.countOfLoadedMessges++
-//            }
-//        }
-//        print(arrayToMessenger.count)
-//        return arrayToMessenger
-//    }
-    
     //MARK: - Database funcs
     
     func getMessageFromId(messageId: String) -> String? {
@@ -314,28 +285,25 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 if result.next() {
                     messageText = result.stringForColumnIndex(0)
                 }
-                
                 result.close()
             }
             catch {
                 print(error)
             }
-            
         }
-        
         return messageText
     }
     
     func getDatabaseURL() -> NSURL {
         var fileURL = NSURL()
         if let documents = try? NSFileManager.defaultManager().URLForDirectory(.DocumentDirectory, inDomain: .UserDomainMask, appropriateForURL: nil, create: false) {
+            
             fileURL = documents.URLByAppendingPathComponent("testy.sqlite")
         }
         return fileURL
     }
     
     func cleanDatabase() {
-        
         guard let fileURL = self.fileURL else {
             print("no file")
             return
@@ -430,7 +398,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 print(error)
             }
         }
-        
         print("finished filling")
     }
     
