@@ -15,6 +15,7 @@
 		45022C901C5B616500D35341 /* FMDBTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45022C8F1C5B616500D35341 /* FMDBTestTests.swift */; };
 		45022C9B1C5B616500D35341 /* FMDBTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45022C9A1C5B616500D35341 /* FMDBTestUITests.swift */; };
 		45022D161C5F817100D35341 /* MyMessageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45022D151C5F817100D35341 /* MyMessageTableViewCell.swift */; };
+		45210BC51C61F8D0007D6ACB /* DatabaseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45210BC41C61F8D0007D6ACB /* DatabaseModel.swift */; };
 		939ACD4980BEBCDF0A21D0EA /* Pods_FMDBTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2E37674D093F92A119B41CC /* Pods_FMDBTest.framework */; };
 /* End PBXBuildFile section */
 
@@ -52,6 +53,7 @@
 		45022C9C1C5B616500D35341 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		45022CD91C5B637000D35341 /* FMDBTest-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FMDBTest-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
 		45022D151C5F817100D35341 /* MyMessageTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyMessageTableViewCell.swift; sourceTree = "<group>"; };
+		45210BC41C61F8D0007D6ACB /* DatabaseModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseModel.swift; sourceTree = "<group>"; };
 		C2E37674D093F92A119B41CC /* Pods_FMDBTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FMDBTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1A7F2F9CEEA7C9CEE855441 /* Pods-FMDBTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FMDBTest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FMDBTest/Pods-FMDBTest.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -118,6 +120,7 @@
 			children = (
 				45022C7A1C5B616500D35341 /* AppDelegate.swift */,
 				45022C7C1C5B616500D35341 /* ViewController.swift */,
+				45210BC41C61F8D0007D6ACB /* DatabaseModel.swift */,
 				45022D151C5F817100D35341 /* MyMessageTableViewCell.swift */,
 				45022CA91C5B622A00D35341 /* Storyboards */,
 				45022CDC1C5B637D00D35341 /* Supporting files */,
@@ -360,6 +363,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				45210BC51C61F8D0007D6ACB /* DatabaseModel.swift in Sources */,
 				45022D161C5F817100D35341 /* MyMessageTableViewCell.swift in Sources */,
 				45022C7D1C5B616500D35341 /* ViewController.swift in Sources */,
 				45022C7B1C5B616500D35341 /* AppDelegate.swift in Sources */,

@@ -20,10 +20,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     @IBOutlet weak var messageField: UITextField!
     @IBOutlet weak var sendMessageButton: UIButton!
     
+    let dataBaseManager = DatabaseModel()
     var loadMoreStatus = false
-    var fileURL: NSURL!
-    var dbWriter: FMDatabaseQueue!
-    var dbReader: FMDatabaseQueue!
     var countOfLoadedMessges = 0
     var isLoadingMessages = false
     
@@ -33,7 +31,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.navigationController?.navigationBar.titleTextAttributes = [
             NSForegroundColorAttributeName : UIColor.lightGrayColor(),
             NSFontAttributeName : UIFont.systemFontOfSize(18, weight: UIFontWeightThin)
@@ -53,13 +50,13 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         self.tableView.estimatedRowHeight = 60
         self.tableView.rowHeight = UITableViewAutomaticDimension
         
-        self.fileURL = getDatabaseURL()
+        self.dataBaseManager.fileURL = self.dataBaseManager.getDatabaseURL()
         
-        self.cleanDatabase()
-        self.createReaderWriter()
-        self.createDatabase()
+        self.dataBaseManager.cleanDatabase()
+        self.dataBaseManager.createReaderWriter()
+        self.dataBaseManager.createDatabase()
         
-        self.messages = self.readDatabase(nil, limit: 40)
+        self.messages = self.dataBaseManager.readDatabase(nil, limit: 40)
         self.tableView.setContentOffset(CGPointMake(0, CGFloat.max), animated: true)
     }
     
@@ -100,7 +97,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         if indexPath.row % 2 == 0 {
             
             cell = tableView.dequeueReusableCellWithIdentifier("cellMyself", forIndexPath: indexPath) as! MyMessageTableViewCell
-            if self.getMessageFromId(self.messages[indexPath.row]) == "message_text-196" || self.getMessageFromId(self.messages[indexPath.row]) == "message_text-191" {
+            if self.dataBaseManager.getMessageFromId(self.messages[indexPath.row]) == "message_text-196" || self.dataBaseManager.getMessageFromId(self.messages[indexPath.row]) == "message_text-191" {
                 
                 /*
                 тут я вывожу картинку и выдает такую хрень
@@ -115,11 +112,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 cell = tableView.dequeueReusableCellWithIdentifier("myCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
                 cell.myImageView.backgroundColor = UIColor.lightGrayColor()
             } else {
-                cell.myMessageTextLabel.text = self.getMessageFromId(self.messages[indexPath.row])
+                cell.myMessageTextLabel.text = self.dataBaseManager.getMessageFromId(self.messages[indexPath.row])
             }
         } else {
             cell = tableView.dequeueReusableCellWithIdentifier("cellSender", forIndexPath: indexPath) as! MyMessageTableViewCell
-            if self.getMessageFromId(self.messages[indexPath.row]) == "message_text-191" || self.getMessageFromId(self.messages[indexPath.row]) == "message_text-196" {
+            if self.dataBaseManager.getMessageFromId(self.messages[indexPath.row]) == "message_text-191" || self.dataBaseManager.getMessageFromId(self.messages[indexPath.row]) == "message_text-196" {
                 
                 /*
                 тут я вывожу картинку и выдает такую хрень
@@ -134,7 +131,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 cell = tableView.dequeueReusableCellWithIdentifier("senderCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
                 cell.myImageView.backgroundColor = UIColor.lightGrayColor()
             } else {
-                cell.senderMessageTextLabel.text = self.getMessageFromId(self.messages[indexPath.row])
+                cell.senderMessageTextLabel.text = self.dataBaseManager.getMessageFromId(self.messages[indexPath.row])
             }
         }
         
@@ -157,7 +154,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 
                 self.isLoadingMessages = true
                 let lastMessage = self.messages.first
-                let newMessages = self.readDatabase(lastMessage, limit: 10)
+                let newMessages = self.dataBaseManager.readDatabase(lastMessage, limit: 10)
                 if newMessages.count > 0 {
                     
                     self.messages = newMessages + self.messages
@@ -170,9 +167,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 } else {
                     // здесь досоздаем базу данных и суём в начало общего массива
                     print("empty! \n need to append to array new record")
-                    createDatabase()
+                    self.dataBaseManager.createDatabase()
                     dispatch_async(dispatch_get_main_queue()) {
-                        let arrayToAppend = self.readDatabase(self.messages.last, limit: 50)
+                        let arrayToAppend = self.dataBaseManager.readDatabase(self.messages.last, limit: 50)
                         for i in 0...49 {
                             self.messages.insert(arrayToAppend[i], atIndex: i)
                         }
@@ -245,11 +242,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func saveToDataBase(text: String, finishBlock: ((success: Bool) -> ())) {
         print("saveToDataBase")
-        guard self.dbWriter != nil else { return }
+        guard self.dataBaseManager.dbWriter != nil else { return }
         
         var success: Bool = false
-        self.dbWriter.inTransaction { db, _ in
-            
+        
+        self.dataBaseManager.dbWriter.inTransaction { db, _ in
             let messageTime = NSDate().timeIntervalSince1970
             let messageId = "id-\(messageTime)"
             do {
@@ -269,136 +266,4 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         finishBlock(success: success)
     }
-    
-    //MARK: - Database funcs
-    
-    func getMessageFromId(messageId: String) -> String? {
-        guard let dbReader = self.dbReader else { return nil }
-        
-        var messageText: String?
-        
-        dbReader.inDatabase { db in
-            
-            do {
-                let result = try db.executeQuery("select message_text from test where message_id = ?", values: [messageId])
-                
-                if result.next() {
-                    messageText = result.stringForColumnIndex(0)
-                }
-                result.close()
-            }
-            catch {
-                print(error)
-            }
-        }
-        return messageText
-    }
-    
-    func getDatabaseURL() -> NSURL {
-        var fileURL = NSURL()
-        if let documents = try? NSFileManager.defaultManager().URLForDirectory(.DocumentDirectory, inDomain: .UserDomainMask, appropriateForURL: nil, create: false) {
-            
-            fileURL = documents.URLByAppendingPathComponent("testy.sqlite")
-        }
-        return fileURL
-    }
-    
-    func cleanDatabase() {
-        guard let fileURL = self.fileURL else {
-            print("no file")
-            return
-        }
-        do {
-            try NSFileManager.defaultManager().removeItemAtURL(fileURL)
-        } catch {
-            print("error cleaning database \(error)")
-        }
-    }
-    
-    func createReaderWriter() {
-        self.dbWriter = FMDatabaseQueue(path: fileURL.absoluteString)
-        self.dbWriter.inDatabase { db in
-            db.executeStatements("PRAGMA journal_mode=WAL;")
-        }
-        
-        self.dbWriter.inTransaction { db, _ in
-            do {
-                try db.executeUpdate("create table if not exists test(message_text text, message_id text, time real)", values: nil)
-                try db.executeUpdate("CREATE INDEX if not exists test_index_omg on test (message_id)", values: nil)
-            } catch let error as NSError {
-                print("failed: \(error.localizedDescription)")
-            }
-        }
-        
-        self.dbReader = FMDatabaseQueue(path: fileURL.absoluteString)
-    }
-    
-    func readDatabase(offset: String? = nil, limit: Int = -1) -> [String] {
-        print("readDatabase")
-        
-        var resultArray: [String] = []
-        //        let width: CGFloat = 0
-        
-        guard self.dbReader != nil else { return [] }
-        self.dbReader.inDatabase { db in
-            do {
-                
-                let rs: FMResultSet
-                
-                switch (offset, limit) {
-                case (nil, let limit) where limit > 0:
-                    rs = try db.executeQuery("select message_id from (select message_id, time from test order by time DESC limit ?) order by time ASC", values: [limit])
-                case (let offset, let limit) where offset != nil && limit > 0:
-                    rs = try db.executeQuery("select message_id from (select message_id, time from test where message_id < ? order by time DESC limit ?) order by time ASC", values: [offset!, limit])
-                case (let offset, _) where offset != nil:
-                    rs = try db.executeQuery("select message_id from test where message_id < ? order by time ASC", values: [offset!])
-                default:
-                    rs = try db.executeQuery("select message_id from test order by time ASC", values: nil)
-                }
-                
-                //
-                
-                
-                while rs.next() {
-                    guard let messageId = rs.stringForColumnIndex(0) else { continue }
-                    resultArray.append(messageId)
-                }
-                
-                rs.close()
-            } catch let error as NSError {
-                print("failed: \(error.localizedDescription)")
-            }
-        }
-        
-        return resultArray
-    }
-    
-    func createDatabase() {
-        print("createDatabase")
-        guard self.dbWriter != nil else { return }
-        
-        self.dbWriter.inTransaction { db, _ in
-            
-            self.fillDB(db)
-        }
-    }
-    
-    func fillDB(db: FMDatabase) {
-        for i in 0...199 {
-            let dateFormatter = NSDateFormatter()
-            dateFormatter.dateFormat = "MM/dd/yyyy HH:mm:ss:SSS"
-            
-            let messageTime = NSDate().timeIntervalSince1970
-            
-            do {
-                try db.executeUpdate("insert into test (message_text, message_id, time) values (?, ?, ?)",
-                    values: ["message_text-\(i)", "id-\(messageTime)", "\(messageTime)"])
-            }
-            catch {
-                print(error)
-            }
-        }
-        print("finished filling")
-    }
-    
 }
