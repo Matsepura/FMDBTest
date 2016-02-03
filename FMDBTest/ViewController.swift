@@ -13,6 +13,8 @@ class ViewController: UIViewController{
     
     //MARK: - Property
     
+    let backgroundQueue: dispatch_queue_t = dispatch_queue_create("com.a.identifier", DISPATCH_QUEUE_CONCURRENT)
+    
     @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
     
     @IBOutlet var footer: UIView!
@@ -44,14 +46,14 @@ class ViewController: UIViewController{
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
         view.addGestureRecognizer(tap)
-
+        
         tableView.delegate = self
         tableView.dataSource = self
         self.tableView.tableFooterView = UIView()
         
         self.tableView.estimatedRowHeight = 60
         self.tableView.rowHeight = UITableViewAutomaticDimension
-
+        
         self.dataBaseManager.fileURL = self.dataBaseManager.getDatabaseURL()
         
         self.dataBaseManager.cleanDatabase()
@@ -61,7 +63,6 @@ class ViewController: UIViewController{
         self.messages = self.dataBaseManager.readDatabase(nil, limit: 40)
         self.tableView.setContentOffset(CGPointMake(0, CGFloat.max), animated: true)
     }
-    
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
@@ -81,7 +82,7 @@ class ViewController: UIViewController{
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     
-
+    
     //MARK: - Keyboard show/hide
     
     func keyboardWillShow(notification: NSNotification) {
@@ -120,14 +121,27 @@ class ViewController: UIViewController{
             self.saveToDataBase(message) { success in
                 guard success else { return }
                 guard self.messages.count > self.tableView.numberOfRowsInSection(0) else { return }
-                self.tableView.reloadData()
-                
-                let height = self.tableView.contentSize.height - self.tableView.bounds.height
-                self.tableView.contentOffset = CGPoint(x: 0, y: height)
+//                dispatch_async(self.backgroundQueue) {
+//                    dispatch_async(dispatch_get_main_queue()) {
+                    self.tableView.reloadData()
+//                }
+                    // поставил тут этот диспатч и он не вылечил баг
+                    // при котором если высоко наверх отмотать и отправить сообщение
+                    // и отправить сообщение то приложение зависало
+                    // возвращает только один раз после нажатия "send"
+                    // вылечил с помощью  dispatch_async(self.backgroundQueue)
+                    // не вылечил :[
+//                    dispatch_async(dispatch_get_main_queue()) {
+//                        dispatch_async(self.backgroundQueue) {
+                    let height = self.tableView.contentSize.height - self.tableView.bounds.height
+                    //                self.tableView.contentOffset = CGPoint(x: 0, y: height)
+                    self.tableView.setContentOffset(CGPoint(x: 0, y: height), animated: false)
+//                    }
             }
             messageField.text = ""
         }
     }
+        
     
     func saveToDataBase(text: String, finishBlock: ((success: Bool) -> ())) {
         print("saveToDataBase")
@@ -152,12 +166,11 @@ class ViewController: UIViewController{
                 success = false
             }
         }
-        
         finishBlock(success: success)
     }
 }
 
-    // MARK: - Table view data source
+// MARK: - Table view data source
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
@@ -173,25 +186,23 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         
         var cell: MyMessageTableViewCell
         let textInCell = self.dataBaseManager.getMessageFromId(self.messages[indexPath.row])
-        print(textInCell)
-        print(indexPath.row)
         
         switch (indexPath.row, textInCell) {
             
-        case (let i, let textForImage) where i % 2 == 0 && textForImage == "message_text-196" || i % 2 == 0 && textForImage == "message_text-191":
+        case (let i, let textForImage) where i % 2 == 0 && textForImage == "message_text-196"
+            || i % 2 == 0 && textForImage == "message_text-191":
             
             self.tableView.layoutIfNeeded()
             cell = tableView.dequeueReusableCellWithIdentifier("myCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
             cell.myImageView.backgroundColor = UIColor.lightGrayColor()
-            print("(let i, let textForImage) where i % 2 == 0 && textForImage ==")
             
         case (let i, _) where i % 2 == 0:
             
             cell = tableView.dequeueReusableCellWithIdentifier("cellMyself", forIndexPath: indexPath) as! MyMessageTableViewCell
             cell.myMessageTextLabel.text = textInCell
-            print("(let i, _) where i % 2 == 0")
             
-        case (let i, let textForImage) where i % 2 != 0 && textForImage == "message_text-196" || i % 2 != 0 && textForImage == "message_text-191":
+        case (let i, let textForImage) where i % 2 != 0 && textForImage == "message_text-196"
+            || i % 2 != 0 && textForImage == "message_text-191":
             
             /*
             тут я вывожу картинку и выдает такую хрень
@@ -204,18 +215,15 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             
             cell = tableView.dequeueReusableCellWithIdentifier("senderCellWithImage", forIndexPath: indexPath) as! MyMessageTableViewCell
             cell.senderImageView.backgroundColor = UIColor.lightGrayColor()
-            print("(let i, let textForImage) where i % 2 != 0 && textForImage ==")
             
         case (let i, _) where i % 2 != 0:
             
             cell = tableView.dequeueReusableCellWithIdentifier("cellSender", forIndexPath: indexPath) as! MyMessageTableViewCell
             cell.senderMessageTextLabel.text = textInCell
-            print("(let i, _) where i % 2 != 0:")
             
         default:
             cell = tableView.dequeueReusableCellWithIdentifier("cellMyself", forIndexPath: indexPath) as! MyMessageTableViewCell
-            cell.myMessageTextLabel.text = "error!"
-            break
+            cell.myMessageTextLabel.text = "error in ''tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell'' !"
         }
         
         return cell

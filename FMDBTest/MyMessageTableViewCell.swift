@@ -14,7 +14,6 @@ class MyMessageTableViewCell: UITableViewCell {
     @IBOutlet weak var myImageView: UIImageView!
     @IBOutlet weak var senderMessageTextLabel: UILabel!
     @IBOutlet weak var senderImageView: UIImageView!
-
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -26,5 +25,4 @@ class MyMessageTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-
 }
