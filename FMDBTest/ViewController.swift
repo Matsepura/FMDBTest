@@ -9,7 +9,7 @@
 import UIKit
 import FMDB
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ViewController: UIViewController{
     
     //MARK: - Property
     
@@ -24,6 +24,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     var loadMoreStatus = false
     var countOfLoadedMessges = 0
     var isLoadingMessages = false
+    
+    
     
     lazy var messages: [String] = []
     
@@ -42,14 +44,14 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
         view.addGestureRecognizer(tap)
-        
+
         tableView.delegate = self
         tableView.dataSource = self
         self.tableView.tableFooterView = UIView()
         
         self.tableView.estimatedRowHeight = 60
         self.tableView.rowHeight = UITableViewAutomaticDimension
-        
+
         self.dataBaseManager.fileURL = self.dataBaseManager.getDatabaseURL()
         
         self.dataBaseManager.cleanDatabase()
@@ -79,7 +81,85 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     
+
+    //MARK: - Keyboard show/hide
+    
+    func keyboardWillShow(notification: NSNotification) {
+        UIView.animateWithDuration(0.1) {
+            self.view.frame.origin.y -= self.getKeyboardHeightFromNotification(notification)
+        }
+    }
+    
+    func keyboardWillHide(notification: NSNotification) {
+        UIView.animateWithDuration(0.1) {
+            self.view.frame.origin.y += self.getKeyboardHeightFromNotification(notification)
+        }
+    }
+    
+    private func getKeyboardHeightFromNotification(notification: NSNotification) -> CGFloat {
+        guard let info = notification.userInfo else { return 0 }
+        guard let infoValue = info[UIKeyboardFrameEndUserInfoKey] as? NSValue else { return 0 }
+        let keyboardFrame = infoValue.CGRectValue()
+        return keyboardFrame.height
+    }
+    
+    func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
+    //MARK: - Chat funcs
+    
+    @IBAction func sendMessage(sender: AnyObject) {
+        
+        guard let message = messageField.text else { return }
+        
+        // if ниже - это проверка на пустое поле (иначе сохраняет пустые поля аля баг)
+        // может вывести в свич? чтобы потом сохранять отдельно картинки, текст, ничего, юрл и тд?
+        
+        if messageField.text != "" {
+            self.saveToDataBase(message) { success in
+                guard success else { return }
+                guard self.messages.count > self.tableView.numberOfRowsInSection(0) else { return }
+                self.tableView.reloadData()
+                
+                let height = self.tableView.contentSize.height - self.tableView.bounds.height
+                self.tableView.contentOffset = CGPoint(x: 0, y: height)
+            }
+            messageField.text = ""
+        }
+    }
+    
+    func saveToDataBase(text: String, finishBlock: ((success: Bool) -> ())) {
+        print("saveToDataBase")
+        guard self.dataBaseManager.dbWriter != nil else { return }
+        
+        var success: Bool = false
+        
+        self.dataBaseManager.dbWriter.inTransaction { db, _ in
+            let messageTime = NSDate().timeIntervalSince1970
+            let messageId = "id-\(messageTime)"
+            do {
+                try db.executeUpdate("insert into test (message_text, message_id, time) values (?, ?, ?)",
+                    values: [text, messageId, "\(messageTime)"])
+                
+                self.messages.append(messageId)
+                
+                success = true
+            }
+            catch {
+                print(error)
+                
+                success = false
+            }
+        }
+        
+        finishBlock(success: success)
+    }
+}
+
     // MARK: - Table view data source
+
+extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
@@ -192,77 +272,4 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         self.isLoadingMessages = false
     }
     
-    //MARK: - Keyboard show/hide
-    
-    func keyboardWillShow(notification: NSNotification) {
-        UIView.animateWithDuration(0.1) {
-            self.view.frame.origin.y -= self.getKeyboardHeightFromNotification(notification)
-        }
-    }
-    
-    func keyboardWillHide(notification: NSNotification) {
-        UIView.animateWithDuration(0.1) {
-            self.view.frame.origin.y += self.getKeyboardHeightFromNotification(notification)
-        }
-    }
-    
-    private func getKeyboardHeightFromNotification(notification: NSNotification) -> CGFloat {
-        guard let info = notification.userInfo else { return 0 }
-        guard let infoValue = info[UIKeyboardFrameEndUserInfoKey] as? NSValue else { return 0 }
-        let keyboardFrame = infoValue.CGRectValue()
-        return keyboardFrame.height
-    }
-    
-    func dismissKeyboard() {
-        view.endEditing(true)
-    }
-    
-    //MARK: - Chat funcs
-    
-    @IBAction func sendMessage(sender: AnyObject) {
-        
-        guard let message = messageField.text else { return }
-        
-        // if ниже - это проверка на пустое поле (иначе сохраняет пустые поля аля баг)
-        // может вывести в свич? чтобы потом сохранять отдельно картинки, текст, ничего, юрл и тд?
-        
-        if messageField.text != "" {
-            self.saveToDataBase(message) { success in
-                guard success else { return }
-                guard self.messages.count > self.tableView.numberOfRowsInSection(0) else { return }
-                self.tableView.reloadData()
-                
-                let height = self.tableView.contentSize.height - self.tableView.bounds.height
-                self.tableView.contentOffset = CGPoint(x: 0, y: height)
-            }
-            messageField.text = ""
-        }
-    }
-    
-    func saveToDataBase(text: String, finishBlock: ((success: Bool) -> ())) {
-        print("saveToDataBase")
-        guard self.dataBaseManager.dbWriter != nil else { return }
-        
-        var success: Bool = false
-        
-        self.dataBaseManager.dbWriter.inTransaction { db, _ in
-            let messageTime = NSDate().timeIntervalSince1970
-            let messageId = "id-\(messageTime)"
-            do {
-                try db.executeUpdate("insert into test (message_text, message_id, time) values (?, ?, ?)",
-                    values: [text, messageId, "\(messageTime)"])
-                
-                self.messages.append(messageId)
-                
-                success = true
-            }
-            catch {
-                print(error)
-                
-                success = false
-            }
-        }
-        
-        finishBlock(success: success)
-    }
 }

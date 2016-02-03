@@ -13,6 +13,8 @@ class DatabaseModel: NSObject {
     
     //MARK: - Property
     
+//    var delegate: DatabaseModelDelegate?
+    
     var dbWriter: FMDatabaseQueue!
     var dbReader: FMDatabaseQueue!
     var fileURL: NSURL!
@@ -21,7 +23,7 @@ class DatabaseModel: NSObject {
     
     func getMessageFromId(messageId: String) -> String? {
         guard let dbReader = self.dbReader else { return nil }
-        
+
         var messageText: String?
         
         dbReader.inDatabase { db in
@@ -145,3 +147,13 @@ class DatabaseModel: NSObject {
     }
     
 }
+
+//protocol DatabaseModelDelegate {
+//    
+////    var fileURL: NSURL {get}
+//    
+//    func cleanDatabase()
+//    func createReaderWriter()
+//    func createDatabase()
+//       
+//}
